@@ -11,6 +11,7 @@
 同一作者的其他 skill 倉庫：
 
 - [persona-masks-cn](https://github.com/asj252/persona-masks-cn)：讓 AI 助手把「想、做、查」分開的一套輕量角色約定，做成檔案型 skill。
+- [chinese-math-forge](https://github.com/asj252/chinese-math-forge)：中文數學教材的寫作與審查工具：數學嚴謹性審查、繁英翻譯與習題流水線。
 - [writing-forge](https://github.com/asj252/writing-forge)：寫作用的 skill：講解文章的認知審查、忠於原文的簡報、README 頭圖設計。
 
 
