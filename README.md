@@ -1,10 +1,14 @@
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="myst-textbook-forge：用 MyST／Jupyter 寫數學教科書時用的 agent skill——圖表視覺風格、Python 代碼排版、章節編輯與 label 索引">
+</p>
+
 # myst-textbook-forge
 
 用 MyST Markdown／Jupyter Notebook 寫數學教科書時用的 agent skill：統一圖表的視覺風格、把 Python 範例代碼整理成教科書排版、編輯章節（小結、練習、全書 label 索引）。每個 skill 是一個目錄，核心是一份 `SKILL.md`，放進能讀取 skill 目錄的 agent 宿主即可使用。
 
 > **English.** myst-textbook-forge is a small set of agent skills for writing math textbooks in MyST Markdown and Jupyter Notebooks: a consistent visual style for plots and Mermaid diagrams, textbook-style formatting for Python example code, and chapter editing (section summaries, exercises, and a book-wide label index with duplicate and broken-reference checks). The skills are written in Traditional Chinese for now; an English version is planned. Each skill is a folder with a `SKILL.md`; copy it into the skills directory your agent host reads.
 
-> 狀態：試用版（0.1.0）。每個 skill 都由一個只讀公開稿的執行者在陌生樣例上跑通過一次，並經獨立審查；樣例都很小。目前以繁體中文發布，之後會整體改寫成英文版。
+> 狀態：試用版（0.2.0）。每個 skill 都由一個只讀公開稿的執行者在陌生樣例上跑通過一次，並經獨立審查；0.2.0 發布前，兩個繪圖相關 skill（`python-textbook-code-optimizer`、`textbook-visual-style`）又各在另一個 agent 宿主上照公開稿跑過一次樣例（Plotly 寫法與 Jupyter Book 執行緩存的清理未實際驗證）。樣例都很小。目前以繁體中文發布，之後會整體改寫成英文版。
 
 ## 相關倉庫
 
@@ -34,12 +38,12 @@ mkdir -p "$SKILLS_DIR"
 cp -r myst-textbook-forge/textbook-visual-style "$SKILLS_DIR/"
 ```
 
-`python-textbook-code-optimizer` 引用 `textbook-visual-style`，兩個一起裝。執行時用到的是宿主本身的能力：讀寫檔案；`textbook-chapter-editor` 的 label 索引腳本要宿主能執行 Python 3 腳本（只用標準庫）。skill 產出的範例代碼要在你自己的環境執行時，按所用的庫準備（NumPy、matplotlib 或 plotly）；這些不是安裝 skill 的前提。
+`python-textbook-code-optimizer` 引用 `textbook-visual-style`，兩個一起裝。執行時用到的是宿主本身的能力：讀寫檔案；`textbook-chapter-editor` 的 label 索引腳本要宿主能執行 Python 3 腳本（Python 3.10 以上；解析依賴見該 skill 的 `scripts/requirements.txt`）。skill 產出的範例代碼要在你自己的環境執行時，按所用的庫準備（NumPy、matplotlib 或 plotly）；這些不是安裝 skill 的前提。
 
 ## 已知限制
 
-- `textbook-chapter-editor` 的範圍是大學線性代數教材（練習要求具體的矩陣或向量）。label 索引腳本只用標準庫、自己切分 Markdown：引用區塊與列表裡的幾類特殊寫法（見該 skill 的「已知限制」）切分可能與 MyST 不同，腳本會把這些行列在報告末尾「需要人工確認的位置」並在終端提示；跨行的行內程式碼裡的引用寫法不保證。
-- `textbook-visual-style` 還沒寫清楚的幾處：等比例坐標、正方形外框與自訂坐標範圍怎麼協調，「畫布背景」是否包含整張圖的外圍，Mermaid 的語義樣式只適用於 flowchart／graph 的 `classDef` 寫法；下一版補。
+- `textbook-chapter-editor` 的範圍是繁體中文的大學線性代數教材（練習要求具體的矩陣或向量）。label 與粗體檢查改用 markdown-it-py 與 mdit-py-plugins；塊級只取行號，行內按段落差分，不一致或定界未配對的整段保留並逐行列入人工確認，其餘段落繼續；專案自訂 directive 的特殊語義需人工核對，實際支援的擴充見 SKILL。
+- `textbook-visual-style` 還沒寫清楚的兩處：未指定範圍、向外擴展較短方向時，自動邊距與中心怎麼定；flowchart 的「重要分類」與「結構性概念」兩類怎麼區分。下一版補。
 - 兩個繪圖相關 skill 的樣例各在一個 matplotlib 3.10 的環境實際執行過一次（數值與出圖正確）；plotly 的部分與其他版本沒有驗證。
 
 ## 許可

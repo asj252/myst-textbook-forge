@@ -12,7 +12,7 @@ description: 套用教科書統一視覺規範，包含 matplotlib / plotly 配�
 ## 適用範圍
 
 - **Python 繪圖**：matplotlib、plotly（Rule V1–V4）
-- **Mermaid 流程圖**：flowchart、graph、sequenceDiagram 等（Rule V5）
+- **Mermaid 圖表**：各圖型採用 Rule V5 的主題初始化；語義化 `classDef` 與圖末 `class` 語句僅適用於 flowchart／graph，sequenceDiagram 等其他圖型不套用這套節點語法。
 
 ---
 
@@ -41,7 +41,7 @@ C_AREA  = "rgba(31, 78, 156, 0.25)"  # 填充區域（藍，透明，Plotly 用�
 > `(31/255, 78/255, 156/255, 0.25)`，並在注釋中標明（例如 `# C_AREA 的 matplotlib 寫法`）。這是下面「一律引用常數」的唯一例外。
 
 **色彩使用邏輯（幾何繪圖層級）：**
-1. **畫布層**：圖表背景 → `C_BG`
+1. **畫布層**：matplotlib 座標軸繪圖區背景 → `C_BG`（Figure 外圍預設不另設）；plotly 繪圖區與紙面背景 → `C_BG`
 2. **格線層**：格線 → `C_GRID`，linewidth=0.8, alpha=0.7
 3. **結構層**：座標軸、刻度、標記文字 → `C_AXIS`
 4. **狀態層**：變換前 → `C_V2`（深藍灰）；變換後 → `C_V1`（藍）
@@ -51,6 +51,22 @@ C_AREA  = "rgba(31, 78, 156, 0.25)"  # 填充區域（藍，透明，Plotly 用�
 8. **區域層**：填充 → `C_AREA`
 
 整份繪圖代碼中，**所有顏色參數一律引用上述常數**，禁止直接 hardcode 色碼字串。
+
+**結構層的 matplotlib 範例**（已有 `ax`，與 Rule V3 合用）：
+
+```python
+for spine in ax.spines.values():
+    spine.set_color(C_AXIS)
+ax.tick_params(axis='both', colors=C_AXIS)
+ax.set_xlabel('x', color=C_AXIS)
+ax.set_ylabel('y', color=C_AXIS)
+ax.set_title('線性變換', color=C_AXIS)
+ax.axhline(0, color=C_AXIS, linewidth=0.8)
+ax.axvline(0, color=C_AXIS, linewidth=0.8)
+ax.text(0, 0, 'O', color=C_AXIS, ha='right', va='top')
+```
+
+此處的 `O` 是座標原點標記；向量的狀態標籤仍按變換前／後使用 `C_V2`／`C_V1`。
 
 ---
 
@@ -71,14 +87,25 @@ plt.rcParams['axes.unicode_minus'] = False
 
 ## Rule V3：背景、格線與長寬比（matplotlib）
 
+「畫布背景」`C_BG` 在 matplotlib 下指座標軸繪圖區背景；Figure 外圍（`fig.patch`）保持預設而不另設 `C_BG`（使用者另有指定時除外）。plotly 則同時設定 `plot_bgcolor` 與 `paper_bgcolor`，見下。
+
+幾何圖保持 x、y 單位等長。正方形是預設外框，不代表可以悄悄改動使用者指定的座標範圍：
+
+- 未指定固定座標範圍時，可向外擴展較短方向的範圍，使 x、y 跨度相同，再用 `ax.set_aspect('equal', adjustable='box')` 得到正方形外框；不可裁掉原有資料。
+- 使用者固定了 x、y 範圍時，保留範圍，用 `adjustable='box'` 讓外框配合：外框高／寬 = y 跨度／x 跨度。因此非正方形範圍會得到長方形外框。
+- 若同時要求固定範圍、指定外框比例與等比例座標，先檢查上述比例是否相容；不相容時請使用者選擇可放寬的條件，不自行改範圍或拉伸幾何。
+
+以下是使用者指定非正方形範圍的例子（x 跨度 8、y 跨度 4，外框高／寬為 0.5）：
+
 ```python
 ax.set_facecolor(C_BG)
 ax.grid(True, color=C_GRID, linewidth=0.8, alpha=0.7)
-ax.set_aspect('equal', adjustable='box')  # 必須：確保幾何比例正確
-ax.set_box_aspect(1)                      # 預設正方形畫布（用戶無特別指定時）
+ax.set_xlim(-4, 4)
+ax.set_ylim(-2, 2)
+ax.set_aspect('equal', adjustable='box')
 ```
 
-> ⚠️ 若使用者明確指定長寬比（如折線圖、長方形圖表），可調整 `ax.set_box_aspect()` 數值，但 `ax.set_aspect('equal', adjustable='box')` 仍必須保留。
+`ax.set_box_aspect()` 會把 adjustable 改為 `'datalim'`，繪製時可能改動範圍；以上做法不用它。若既有代碼已呼叫它，先用 `ax.set_box_aspect(None)` 解除固定外框，再設定最終範圍與 `ax.set_aspect('equal', adjustable='box')`。Rule V4 的 `data_range` 要在最終範圍確定後讀取。
 
 **plotly 對應寫法：**
 
@@ -117,11 +144,13 @@ ax.quiver(0, 0, vx, vy, color=C_V1, **kw)
 
 > ⚠️ 同一張圖的所有向量共用同一組 `kw`，不得對個別向量單獨 hardcode `width`。
 
+若變換前後向量完全重合，不把兩支同形箭頭疊畫而只看見後畫的一支。可在原位置畫一支共用箭頭（`C_V1`），並在旁邊分別用 `C_V2`／`C_V1` 標示「變換前 v」「變換後 Av」，文字說明 `Av = v`、箭頭共用。只偏移文字，不移動向量起點、終點或改變長度；其餘向量仍各按狀態用色，共用同一組 `kw`。
+
 ---
 
 ## Rule V5：Mermaid 配色規範
 
-所有 Mermaid 圖表必須在 `%%{init: ...}%%` 指令中套用以下主題變數，並透過 `classDef` 手動指定節點語義樣式。
+所有 Mermaid 圖表在 `%%{init: ...}%%` 指令中套用以下主題變數。僅 flowchart／graph 透過下列 `classDef` 與圖末 `class` 語句指定節點語義樣式；sequenceDiagram 等其他圖型依各自支援的語法設定，不使用這套 `classDef`。
 
 ### 主題初始化（所有圖通用，固定寫法）
 
@@ -180,7 +209,15 @@ classDef future    fill:#FFFFFF,stroke:#8FA3BF,stroke-dasharray:5 5,color:#7F8C8
 
 ---
 
+## 無頭 Chrome 列印 PDF 的 Mermaid 驗證
+
+使用無頭 Chrome 列印含 Mermaid 的頁面時，須在頁面腳本執行之前把主題設為淺色。先在瀏覽器 context／page 設定淺色偏好，再載入頁面；若網站另用儲存的主題設定或根元素屬性控制深淺色，也須依該網站實際機制在初始化腳本中先設為淺色，不假設所有網站都用同一個儲存鍵。不能等頁面腳本執行完才切換，也不能只靠 Mermaid 的 `theme: base` 代替頁面淺色主題。
+
+列印前等待每幅 Mermaid 完成渲染，再輸出 PDF。驗證時建立逐幅圖清單，對每幅圖在 PDF 中的圖內區域核對應有的完整標籤，並記錄通過／缺失；可從向量文字的區域座標擷取，或裁切該區域後目視／OCR。標籤換行時可合併排版空白，仍須比對完整標籤，不能用子字串代替。正文出現同名詞不算該圖通過；例如預期標籤「矩陣」不能因另一標籤「矩陣分解」含有它就通過。圖內文字無法可靠擷取時逐圖目視確認，不以全文搜尋或文字擷取失敗判為已通過。
+
+---
+
 ## 詢問使用者的時機
 
 - 若不確定圖表用途（線性轉換 / 特徵值 / 一般流程圖），可快速確認後決定主色調。
-- 若使用者未指定長寬比，預設套用 `ax.set_box_aspect(1)`（正方形）。
+- 若使用者未指定長寬比與固定座標範圍，依 Rule V3 向外擴展較短方向的範圍，預設正方形外框；固定範圍時保留範圍，遇到互不相容的外框要求時請使用者選擇放寬條件。

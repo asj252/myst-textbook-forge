@@ -322,6 +322,14 @@ graph TD
 
 ### 執行方式（優先使用腳本，不要人工掃描）
 
+需 Python 3.10 以上，解析依賴見 `scripts/requirements.txt`。缺少時先確認使用者選用的環境，經同意再安裝：
+
+```bash
+python -m pip install -r <本 skill 的目錄>/scripts/requirements.txt
+```
+
+缺少依賴時以退出碼 2 停下，不產生報告；腳本不自行安裝。`myst_common.py` 隨 skill 附帶，供後續 CMF-T007 繁簡轉換共用；該任務接入時各自附相同副本並核對位元組。
+
 ```bash
 python3 <本 skill 的目錄>/scripts/generate_label_index.py \
     chapters/*.md chapters/*.ipynb \
@@ -343,7 +351,8 @@ python3 <本 skill 的目錄>/scripts/generate_label_index.py \
 | 行內方程 label | `$$ ... $$ (eq-xxx)` |
 | 交叉引用 | `` {prf:ref}`xxx` ``、`` {ref}`xxx` ``、`` {numref}`xxx` ``、`` {eq}`xxx` ``，含 `` {ref}`文字 <xxx>` `` 形式；directive 標題行裡的引用也收集 |
 | 不收集 | 程式碼區塊（含 ```` ```{code-cell} ````）與行內程式碼裡的 label、錨點與引用（它們只是示例）；寫在標題之前的 `(sec-xxx)=` 歸到它所標的標題 |
-| 已知限制 | 行內程式碼按同一行配對：跨行的行內程式碼裡若有引用或錨點的寫法，可能被當成正文收集；引用區塊（`>`）裡的列表、程式碼圍欄、Tab、縮排內容與沒有 `>` 的延續行，列表裡的引用區塊、空的列表項目（標記後沒有內容），以及列表標記後緊接 Tab 的寫法，切分可能與 MyST 不同（例如引用區塊裡沒有寫結尾的圍欄，可能把之後的正文也當成程式碼）：腳本會把這些行列在報告末尾「需要人工確認的位置」，並在終端提示；遇到時請對照確認，或改寫成不放在引用區塊裡、用空格代替 Tab |
+| 解析範圍 | 使用 markdown-it-py 的 CommonMark、表格與 mdit-py-plugins（colon_fence、dollarmath、front matter、MyST target／role、footnote、amsmath）。塊級只用行號；一般 directive 內文遞迴解析，行內按段落掃描，標題與表格單元格也檢查。YAML 選項塊整段保護，只開放 caption、title、alt、subtitle 四種文字選項；YAML 由完整文字標量產生 token，註解與其餘選項不收引用或粗體候選。無法獨立核對的選項行原樣保留並登記。行內掃描與 text token 差分不一致或定界未配對時，整段原樣保留，逐行列入「需要人工確認的位置」，其餘段落繼續；label、引用與粗體候選仍由 token 收集。專案自訂 directive 的特殊語義仍需人工核對 |
+| 已知限制 | directive 的冒號式選項區不轉換，含中文的列進人工確認。 |
 
 ### 輸出格式（由腳本自動生成）
 
@@ -390,6 +399,17 @@ python3 <本 skill 的目錄>/scripts/generate_label_index.py \
 3. 最後附上一行提示：「以上為任務X、任務X 的輸出，如需調整任何部分請告知。」
 
 ---
+
+## 靜態網頁的粗體與互動輸出檢查
+
+輸出前用共用解析層檢查 `.md` 或 `.ipynb` 的 Markdown：
+
+```bash
+python <本 skill 的目錄>/scripts/check_bold.py chapters/ch08.md chapters/ch09.ipynb
+```
+
+- 粗體若寫成 `**結論。**接著說明`，標點後的 `**` 緊接漢字，CommonMark 可能無法閉合，網頁會顯示星號。把標點移到粗體外：`**結論**。接著說明`。腳本找解析後文字 token 殘留的 `**`，列出檔案、格與所在區塊的起行；退出碼 0 表示沒有候選、1 表示有候選、2 表示輸入／依賴錯誤。逐條判斷是否原本就要顯示星號，不盲目批次替換；程式碼與數學式內的示例不列入。
+- ipywidgets（如 Pygwalker）的格若在靜態網頁只剩佔位，為該 code cell 加上 `remove-output` tag，並在格後附靜態截圖與圖注。保留互動程式碼；若尚無截圖，回報缺少的圖，不假稱已補好。以實際靜態建置結果確認佔位消失、圖片與圖注可見。
 
 ## 品質檢查清單（每次輸出前自我檢核）
 
