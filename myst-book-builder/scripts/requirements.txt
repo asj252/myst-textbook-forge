@@ -1,0 +1,6 @@
+# QA／Chromium 列印：Python >=3.10，websocket-client >=1.9（已驗證 1.9.0）。
+websocket-client>=1.9
+# 合併：可用另一個既有 Python；已驗證版本記於公開說明。
+pypdf>=6.21.4
+# 建書另需既有 Jupyter Book 2／MyST 與相容 theme；
+# Notebook 的 kernel、資料及計算庫屬書專案依賴，不在此安裝。
