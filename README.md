@@ -10,7 +10,7 @@
 
 > 狀態：試用版（0.2.0）。每個 skill 都由一個只讀公開稿的執行者在陌生樣例上跑通過一次，並經獨立審查；0.2.0 發布前，兩個繪圖相關 skill（`python-textbook-code-optimizer`、`textbook-visual-style`）又各在另一個 agent 宿主上照公開稿跑過一次樣例（Plotly 寫法與 Jupyter Book 執行緩存的清理未實際驗證）。樣例都很小。目前以繁體中文發布，之後會整體改寫成英文版。
 
-`myst-book-builder` 是未發布的新功能，上述 0.2.0 驗證僅涵蓋原三個 skill；新流程的驗證狀態見下方限制。
+`myst-book-builder` 與 `typst-compat-fixer` 尚未發布。上述 0.2.0 驗證涵蓋原三個 skill。
 
 ## 相關倉庫
 
@@ -29,6 +29,7 @@
 | [`python-textbook-code-optimizer`](python-textbook-code-optimizer/SKILL.md) | 把 Python 範例代碼整理成教科書排版：全域輸出格式、步驟標題、「代碼計算值」與「公式預期值」對照、例題樣板；有繪圖時同時套用 `textbook-visual-style` |
 | [`textbook-chapter-editor`](textbook-chapter-editor/SKILL.md) | 編輯繁體中文的大學線性代數教材章節：章節掃描、各節小結、全章總結與知識結構圖、學習目標、練習模塊，以及全書 label 索引、重複與斷鏈檢查（附腳本） |
 | [`myst-book-builder`](myst-book-builder/SKILL.md)（未發布） | 使用既有 JB2 環境建書與執行 Notebook，按 toc 檢查 hydrated 網站，逐章 Chromium 印刷，核對來源、實際 origin 與分件指紋後合併導航 PDF |
+| [`typst-compat-fixer`](typst-compat-fixer/SKILL.md)（未發布） | 修復 MyST Markdown 與 Notebook 內供 Typst 匯出的公式和標籤選項，保護程式碼與註解，回報引用和來源歧義 |
 
 ## 安裝
 
@@ -44,6 +45,12 @@ cp -r myst-textbook-forge/textbook-visual-style "$SKILLS_DIR/"
 `python-textbook-code-optimizer` 引用 `textbook-visual-style`，兩個一起裝。執行時用到的是宿主本身的能力：讀寫檔案；`textbook-chapter-editor` 的 label 索引腳本要宿主能執行 Python 3 腳本（Python 3.10 以上；解析依賴見該 skill 的 `scripts/requirements.txt`）。skill 產出的範例代碼要在你自己的環境執行時，按所用的庫準備（NumPy、matplotlib 或 plotly）；這些不是安裝 skill 的前提。
 
 `myst-book-builder` 自含腳本，Python 3.10 以上；QA／列印用 websocket-client 與既有 Chromium，合併用 pypdf，可使用不同 Python。建書另需既有 Jupyter Book 2、Node 與相容 theme；各 Notebook 的計算庫／資料由書專案準備。預檢只報缺少項，不自動安裝。
+
+單獨安裝 `typst-compat-fixer` 時，複製整個 skill 目錄，再用執行修復腳本的 Python 3.10 以上環境安裝解析依賴：
+
+```bash
+python -m pip install -r "$SKILLS_DIR/typst-compat-fixer/scripts/requirements.txt"
+```
 
 ## 已知限制
 

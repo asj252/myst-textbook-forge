@@ -2,6 +2,11 @@
 
 ## 未發布
 
+### typst-compat-fixer
+
+- 新增 MyST Markdown／Notebook 的 Typst 相容性修復。按解析結果與原文位置替換公式及標籤選項，保護程式碼、HTML、YAML 和連結目標，並回報引用和來源歧義。
+- 先檢查批次路徑，再逐檔安全寫入。新增獨立安裝的依賴清單及章節編號、中文引用範本。
+
 ### myst-book-builder
 
 - 新增既有 JB2 環境預檢、真實執行與續跑溯源指引、按 toc 的 hydrated 網站 QA、共用印前硬門與逐章 Chromium PDF。
