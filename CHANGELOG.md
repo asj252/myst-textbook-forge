@@ -1,6 +1,6 @@
 # 變更記錄
 
-## 未發布
+## 主分支更新
 
 ### typst-compat-fixer
 

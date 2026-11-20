@@ -10,7 +10,7 @@
 
 > 狀態：試用版（0.2.0）。每個 skill 都由一個只讀公開稿的執行者在陌生樣例上跑通過一次，並經獨立審查；0.2.0 發布前，兩個繪圖相關 skill（`python-textbook-code-optimizer`、`textbook-visual-style`）又各在另一個 agent 宿主上照公開稿跑過一次樣例（Plotly 寫法與 Jupyter Book 執行緩存的清理未實際驗證）。樣例都很小。目前以繁體中文發布，之後會整體改寫成英文版。
 
-`myst-book-builder` 與 `typst-compat-fixer` 尚未發布。上述 0.2.0 驗證涵蓋原三個 skill。
+上述 0.2.0 驗證涵蓋原三個 skill。`myst-book-builder` 與 `typst-compat-fixer` 可從 `main` 取得。
 
 ## 相關倉庫
 
@@ -28,8 +28,8 @@
 | [`textbook-visual-style`](textbook-visual-style/SKILL.md) | 教科書的統一視覺規範：matplotlib／plotly 的色彩常數與圖層用色、中文字型、背景與格線、向量一律用 `quiver`，以及 Mermaid 的主題與語義樣式。色碼是一套示例，按角色換成自己的配色 |
 | [`python-textbook-code-optimizer`](python-textbook-code-optimizer/SKILL.md) | 把 Python 範例代碼整理成教科書排版：全域輸出格式、步驟標題、「代碼計算值」與「公式預期值」對照、例題樣板；有繪圖時同時套用 `textbook-visual-style` |
 | [`textbook-chapter-editor`](textbook-chapter-editor/SKILL.md) | 編輯繁體中文的大學線性代數教材章節：章節掃描、各節小結、全章總結與知識結構圖、學習目標、練習模塊，以及全書 label 索引、重複與斷鏈檢查（附腳本） |
-| [`myst-book-builder`](myst-book-builder/SKILL.md)（未發布） | 使用既有 JB2 環境建書與執行 Notebook，按 toc 檢查 hydrated 網站，逐章 Chromium 印刷，核對來源、實際 origin 與分件指紋後合併導航 PDF |
-| [`typst-compat-fixer`](typst-compat-fixer/SKILL.md)（未發布） | 修復 MyST Markdown 與 Notebook 內供 Typst 匯出的公式和標籤選項，保護程式碼與註解，回報引用和來源歧義 |
+| [`myst-book-builder`](myst-book-builder/SKILL.md) | 使用既有 JB2 環境建書與執行 Notebook，按 toc 檢查 hydrated 網站，逐章 Chromium 印刷，核對來源、實際 origin 與分件指紋後合併導航 PDF |
+| [`typst-compat-fixer`](typst-compat-fixer/SKILL.md) | 修復 MyST Markdown 與 Notebook 內供 Typst 匯出的公式和標籤選項，保護程式碼與註解，回報引用和來源歧義 |
 
 ## 安裝
 
@@ -54,7 +54,7 @@ python -m pip install -r "$SKILLS_DIR/typst-compat-fixer/scripts/requirements.tx
 
 ## 已知限制
 
-- `myst-book-builder` 僅處理單一 project 的 JB2／MyST 靜態 HTML→Chromium PDF；不支援 JB1、LaTeX 或 Typst。已在 Windows、Python 3.14.2、Jupyter Book 2.1.2、myst-to-react 1.4.1、websocket-client 1.9.0 與既有 Chromium 上實跑兩章書、三種語言模式；合併另用 Python 3.12.14 與 pypdf 6.21.4。其他平台／版本未驗證。每幅 PDF 圖的完整標籤和箭頭仍需實際看圖，機器檢查不代替視覺驗收；陌生樣例及獨立交付審查另行記錄，新功能尚未發布。
+- `myst-book-builder` 僅處理單一 project 的 JB2／MyST 靜態 HTML→Chromium PDF；不支援 JB1、LaTeX 或 Typst。已在 Windows、Python 3.14.2、Jupyter Book 2.1.2、myst-to-react 1.4.1、websocket-client 1.9.0 與既有 Chromium 上實跑兩章書、三種語言模式；合併另用 Python 3.12.14 與 pypdf 6.21.4。其他平台／版本未驗證。每幅 PDF 圖的完整標籤和箭頭仍需實際看圖，機器檢查不代替視覺驗收；陌生樣例及獨立交付審查另行記錄。
 
 - `textbook-chapter-editor` 的範圍是繁體中文的大學線性代數教材（練習要求具體的矩陣或向量）。label 與粗體檢查改用 markdown-it-py 與 mdit-py-plugins；塊級只取行號，行內按段落差分，不一致或定界未配對的整段保留並逐行列入人工確認，其餘段落繼續；專案自訂 directive 的特殊語義需人工核對，實際支援的擴充見 SKILL。
 - `textbook-visual-style` 還沒寫清楚的兩處：未指定範圍、向外擴展較短方向時，自動邊距與中心怎麼定；flowchart 的「重要分類」與「結構性概念」兩類怎麼區分。下一版補。
