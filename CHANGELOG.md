@@ -2,6 +2,10 @@
 
 ## 主分支更新
 
+### textbook-visual-style
+
+- 明定 Matplotlib 正方形外框的自動邊距與擴展中心，補充 Mermaid flowchart 語義樣式的選擇例子。
+
 ### typst-compat-fixer
 
 - 新增 MyST Markdown／Notebook 的 Typst 相容性修復。按解析結果與原文位置替換公式及標籤選項，保護程式碼、HTML、YAML 和連結目標，並回報引用和來源歧義。

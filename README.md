@@ -57,7 +57,6 @@ python -m pip install -r "$SKILLS_DIR/typst-compat-fixer/scripts/requirements.tx
 - `myst-book-builder` 僅處理單一 project 的 JB2／MyST 靜態 HTML→Chromium PDF；不支援 JB1、LaTeX 或 Typst。已在 Windows、Python 3.14.2、Jupyter Book 2.1.2、myst-to-react 1.4.1、websocket-client 1.9.0 與既有 Chromium 上實跑兩章書、三種語言模式；合併另用 Python 3.12.14 與 pypdf 6.21.4。其他平台／版本未驗證。每幅 PDF 圖的完整標籤和箭頭仍需實際看圖，機器檢查不代替視覺驗收；陌生樣例及獨立交付審查另行記錄。
 
 - `textbook-chapter-editor` 的範圍是繁體中文的大學線性代數教材（練習要求具體的矩陣或向量）。label 與粗體檢查改用 markdown-it-py 與 mdit-py-plugins；塊級只取行號，行內按段落差分，不一致或定界未配對的整段保留並逐行列入人工確認，其餘段落繼續；專案自訂 directive 的特殊語義需人工核對，實際支援的擴充見 SKILL。
-- `textbook-visual-style` 還沒寫清楚的兩處：未指定範圍、向外擴展較短方向時，自動邊距與中心怎麼定；flowchart 的「重要分類」與「結構性概念」兩類怎麼區分。下一版補。
 - 兩個繪圖相關 skill 的樣例各在一個 matplotlib 3.10 的環境實際執行過一次（數值與出圖正確）；plotly 的部分與其他版本沒有驗證。
 
 ## 許可
